@@ -2,7 +2,7 @@ import os
 import sys
 import tensorflow as tf
 from dataclasses import dataclass
-from transformers import AutoTokenizer, DataCollatorForSeq2Seq, GPT2Tokenizer, GPT2Model, TextStreamer, GPT2LMHeadModel
+from transformers import GPT2Tokenizer, GPT2LMHeadModel
 
 from src.logger import logging
 from src.utils import save_model
@@ -20,13 +20,13 @@ class GetModels:
         try:
             if os.path.exists(self.tokenizer_path):
                 tokenizer = GPT2Tokenizer.from_pretrained(self.tokenizer_path)
-                logging.info('Model available!')
+                logging.info('Tokenizer available!')
                 print('Tokenizer available!') 
             else:
                 tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
                 save_model(tokenizer, self.tokenizer_path)
                 logging.info('Downloaded Tokenizer!')
-                print('Models Saved!')
+                print('Tokenizer Saved!')
             return (
                 tokenizer, 
                 self.tokenizer_path,
@@ -62,3 +62,4 @@ if __name__=='__main__':
     tokenizer, tokenizer_path = get_models.get_data_tokenizer_object()
     model, model_path = get_models.get_model_object()
     print('Process Complete!')
+    print('\n')

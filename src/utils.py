@@ -1,5 +1,7 @@
 import os
+import pandas as pd
 import sys
+from csv import writer
 import PyPDF2
 from dataclasses import dataclass
 
@@ -18,14 +20,15 @@ def read_pdf(pdf_file_path, start_page, end_page):
     return extracted_text
 
 
-# saves pdf text into a .txt file     
-def save_text(file_path, text):
+# saves pdf text into a .csv file     
+def save_text(file_path, text_data):
     if os.path.exists(file_path):
-        with open(file_path, "a", encoding="utf-8") as file:
-            file.write(text)
+        with open(file_path, 'a') as f_object:
+            writer_object = writer(f_object)
+            writer_object.writerow(text_data)
+            f_object.close()
     else:
-        with open(file_path, "w", encoding="utf-8") as file:
-            file.write(text)
+        text_data.to_csv(file_path, header=False, index=False)
         
         
 # saves model and tokenizer

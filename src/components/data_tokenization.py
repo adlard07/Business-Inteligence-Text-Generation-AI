@@ -12,21 +12,29 @@ from src.exception import CustomException
 @dataclass
 class DataTokenizer:
     def __init__(self):
-        self.data_path = 'data/content/context.txt'
+        self.data_path = 'data/content/context.csv'
         self.tokenizer = 'artifacts/tokenizer'
 
             
     def initiate_data_tokenization(self):
         try:
             data = DataIngestion()
-            train_data = data.get_data()
+            text_data = data.get_data()
+            
             get_tokenizer = GetModels()
-            tokenizer, tokenizer_path = get_tokenizer.get_data_tokenizer_object()
-            train_encodings = tokenizer(train_data, truncation=True, return_tensors='tf')
+            tokenizer, _ = get_tokenizer.get_data_tokenizer_object()
+            
+            train_data = []
+            for text in text_data:
+                token = tokenizer(text)
+                train_data.append(token)
+                
             logging.info('Data Encoded!')
             print('Data Encoded!')
+            
             return (
-                train_encodings
+                train_data,
+                tokenizer
                 )
             
         except Exception as e:
@@ -35,6 +43,8 @@ class DataTokenizer:
 
 if __name__=='__main__':
     transform = DataTokenizer()
-    train_encodings = transform.initiate_data_tokenization()
-    print(type(train_encodings))
+    train_encodings, tokenizer = transform.initiate_data_tokenization()
+    print(f'Encodings : {train_encodings[:5]}')
+    print(f'Decodings : {tokenizer.decode(train_encodings[1]["input_ids"])}')
     print("Data Tokenization Complete!")
+    print('\n')

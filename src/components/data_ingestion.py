@@ -1,5 +1,7 @@
+import re
 import os
 import sys
+import pandas as pd
 from dataclasses import dataclass
 
 from src.utils import read_pdf, save_text
@@ -33,11 +35,15 @@ class DataIngestion:
         try:
             start_pages = [32, 2, 11, 7]
             end_pages = [369, 16, 208, 218]
+            text = []
             for i in range(len(start_pages)):
                 text = read_pdf(self.paths[i], start_pages[i], end_pages[i])
             logging.info('Data Read!') 
-            train_data = text.split('\n')
-            return train_data
+            clean_text = text.replace('\n', ' ')
+            train_data = re.split(r'[.!?]', clean_text)
+            return (
+                train_data
+                )
                 
         except Exception as e:
             raise CustomException(e, sys)
@@ -46,6 +52,10 @@ class DataIngestion:
 if __name__=='__main__':
     data = DataIngestion()
     train_data = data.get_data()
-    save_text('data\\content\\context.txt', train_data)
-    logging.info("Content Saved as 'context.txt'")
-    print('Content Saved as "context.txt"') 
+    
+    save_text('data\\content\\context.csv', train_data)
+    logging.info("Content Saved as 'context.csv'")
+    print('Content Saved as "context.csv"')
+    
+    print(len(train_data))
+    print('\n')

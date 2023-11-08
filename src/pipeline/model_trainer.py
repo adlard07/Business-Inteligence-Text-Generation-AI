@@ -1,42 +1,34 @@
 import sys
-import numpy as np
+import torch
+from torch.nn.functional import pad
 import tensorflow as tf
 from dataclasses import dataclass
-from transformers import AutoTokenizer, AutoModelForCausalLM, TrainingArguments, Trainer
+from transformers import Trainer, TrainingArguments, GPT2LMHeadModel, GPT2Tokenizer
 
 from src.logger import logging
 from src.utils import save_model
 from src.exception import CustomException
-from src.components.data_tokenization import GetDataTokenization
+from src.components.data_tokenization import DataTokenizer
+from huggingface_hub import notebook_login
+notebook_login()
 
-access_token = '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'
 
 @dataclass
 class ModelTrainer:
-    def group_texts(self, examples):
-        try:        
-            block_size = 32
-            concatenated_examples = {k: sum(examples[k], []) for k in examples.keys()}
-            
-            total_length = len(concatenated_examples[list(examples.keys())[0]])
-            total_length = (total_length // block_size) * block_size
-            
-            grouped_text = {
-                k: [t[i : i + block_size] for i in range(0, total_length, block_size)]
-                for k, t in concatenated_examples.items()
-            }
-            
-            grouped_text["labels"] = grouped_text["input_ids"].copy()
-        
-            return grouped_text
-        
-        except Exception as e:
-            raise CustomException(e, sys)
+    def __init__(self):
+        self.model_path = 'artifacts/model'
+        self.tokenizer_path = 'artifacts/tokenizer'
     
-    
-    
-    def model_training(self,  model, tokenizer, training_dataset):
+    def model_initialize(self, training_dataset):
         try:
+            model = GPT2LMHeadModel.from_pretrained(self.model_path)
+            tokenizer = GPT2Tokenizer.from_pretrained(self.tokenizer_path)
+            
+            tokenizer.pad_token = tokenizer.eos_token
+            
+            max_seq_length = max(len(seq['input_ids']) for seq in training_dataset)
+            padded_sequences = tf.keras.utils.pad_sequences(training_dataset, padding="pre", maxlen=max_seq_length)
+                        
             training_args = TrainingArguments(
                 output_dir="artifacts/output",
                 evaluation_strategy = "epoch",
@@ -44,42 +36,30 @@ class ModelTrainer:
                 weight_decay=0.01,
                 push_to_hub=True,
             )
-            
             trainer = Trainer(
                 model=model,
                 args=training_args,
-                train_dataset=training_dataset,
-                tokenizer=tokenizer
+                train_dataset=padded_sequences
             )
             return (
+                padded_sequences,
                 trainer
             )
                     
         except Exception as e:
             raise CustomException(e, sys)
-
-
+        
+        
 if __name__=='__main__':
-    
-    tokenizer = AutoTokenizer.from_pretrained("artifacts/tokenizer")
-    model = AutoModelForCausalLM.from_pretrained("artifacts/model")
-    print("Models Read!")
-    
-    initiate_tokenizer = GetDataTokenization()
-    tokenized_datasets = initiate_tokenizer.initiate_data_tokenization(tokenizer, model)
-    print("Data Tokenization Complete!")
-    
-    trainer = ModelTrainer()
-    training_dataset = trainer.group_texts(tokenized_datasets)
-    
-    new_model = trainer.model_training(model, tokenizer, training_dataset)
-            
+    transform = DataTokenizer()
+    train_encodings, _ = transform.initiate_data_tokenization()
+
     print("Model training initiating...")
-    
-    new_model.train() 
-    
+    model_trainer = ModelTrainer()
+    padded_sequences, trainer = model_trainer.model_initialize(train_encodings)
+    # trainer.train() 
     print("Model Training Complete")
+    print(padded_sequences)
     
-    save_model(new_model)
-    
-    print("Model Saved!")
+    # save_model(model)
+    # print("Model Saved!")
