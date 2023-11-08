@@ -5,8 +5,8 @@ Welcome to the Business Intelligence Text Generation project! This text generati
 
 ## Installation: 
 There is no need to install any software or libraries. This system is accessible via a web interface, making it easy to use on any device with an internet connection.
-```
 bash
+```
 python -m src.pipeline.model_trainer
 ```
 
@@ -20,8 +20,8 @@ Choose a topic or provide a brief description of the BI content you need.
 Specify the desired length or word count for the generated text.
 Click the "Generate" button.
 Review and Edit: The system will generate a text based on your input. Review the text and make any necessary edits or customizations.
-```
 bash
+```
 python -m app
 ```
 
