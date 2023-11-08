@@ -2,11 +2,22 @@
 Welcome to the Business Intelligence Text Generation project! This text generation system has been fine-tuned specifically for generating content related to Business Intelligence (BI). Whether you're a data analyst, business executive, or simply interested in BI topics, this tool can help you generate insightful and informative text.
 
 
+## Prerequisites
+Before you can run this project, make sure you have the following prerequisites installed:
+- Python (3.9 or higher)
+- Node.js and npm
+- Git
 
-## Installation: 
-There is no need to install any software or libraries. This system is accessible via a web interface, making it easy to use on any device with an internet connection.
-bash
+
+2. Install Python dependencies for the LSTM model:
+```bash
+pip install -r requirements.txt
 ```
+
+## Begin model training: 
+There is no need to install any software or libraries. This system is accessible via a web interface, making it easy to use on any device with an internet connection.
+
+```bash
 python -m src.pipeline.model_trainer
 ```
 
@@ -20,8 +31,7 @@ Choose a topic or provide a brief description of the BI content you need.
 Specify the desired length or word count for the generated text.
 Click the "Generate" button.
 Review and Edit: The system will generate a text based on your input. Review the text and make any necessary edits or customizations.
-bash
-```
+```bash
 python -m app
 ```
 
