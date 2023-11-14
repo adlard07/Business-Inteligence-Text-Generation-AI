@@ -1,6 +1,5 @@
 import sys
 from dataclasses import dataclass
-from transformers import GPT2Tokenizer
 
 from src.components.data_ingestion import DataIngestion
 from src.components.get_tokenizer_model import GetModels
@@ -26,7 +25,7 @@ class DataTokenizer:
             
             train_data = []
             for text in text_data:
-                token = tokenizer(text)
+                token = tokenizer(text, return_tensors="pt", return_attention_mask=False)
                 train_data.append(token)
                 
             logging.info('Data Encoded!')
@@ -44,7 +43,8 @@ class DataTokenizer:
 if __name__=='__main__':
     transform = DataTokenizer()
     train_encodings, tokenizer = transform.initiate_data_tokenization()
-    print(f'Encodings : {train_encodings[:5]}')
-    print(f'Decodings : {tokenizer.decode(train_encodings[1]["input_ids"])}')
     print("Data Tokenization Complete!")
+    
+    print(f'Encodings : {train_encodings[:5]}')
+    print(f'Decodings : {[tokenizer.decode(ele["input_ids"]) for ele in train_encodings[:5]]}')
     print('\n')

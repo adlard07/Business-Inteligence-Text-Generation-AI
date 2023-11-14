@@ -39,7 +39,7 @@ def save_model(model, model_path):
         else:    
             model.save_pretrained(model_path)
             logging.info('Model Saved!')
-            print('Saved!')
+            print('Model Saved!')
             
     except Exception as e:
         raise CustomException(e, sys)

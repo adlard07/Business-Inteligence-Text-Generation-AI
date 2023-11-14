@@ -2,7 +2,7 @@ import os
 import sys
 import tensorflow as tf
 from dataclasses import dataclass
-from transformers import GPT2Tokenizer, GPT2LMHeadModel
+from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from src.logger import logging
 from src.utils import save_model
@@ -19,14 +19,14 @@ class GetModels:
     def get_data_tokenizer_object(self):
         try:
             if os.path.exists(self.tokenizer_path):
-                tokenizer = GPT2Tokenizer.from_pretrained(self.tokenizer_path)
+                tokenizer = AutoTokenizer.from_pretrained(self.tokenizer_path, trust_remote_code=True)
                 logging.info('Tokenizer available!')
                 print('Tokenizer available!') 
             else:
-                tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
-                save_model(tokenizer, self.tokenizer_path)
+                tokenizer = AutoTokenizer.from_pretrained("microsoft/DialoGPT-medium")
                 logging.info('Downloaded Tokenizer!')
-                print('Tokenizer Saved!')
+                print('Downloaded Tokenizer!')
+                save_model(tokenizer, self.tokenizer_path)
             return (
                 tokenizer, 
                 self.tokenizer_path,
@@ -39,14 +39,14 @@ class GetModels:
     def get_model_object(self):
         try:
             if os.path.exists(self.model_path):
-                model = GPT2LMHeadModel.from_pretrained(self.model_path)
+                model = AutoModelForCausalLM.from_pretrained(self.model_path, trust_remote_code=True)
                 logging.info('Model available!')
                 print('Model available!')
             else:
-                model = GPT2LMHeadModel.from_pretrained('gpt2')
-                save_model(model, self.model_path)
+                model = AutoModelForCausalLM.from_pretrained("microsoft/DialoGPT-medium")
                 logging.info('Downloaded Model!')
-                print('Models Saved!')
+                print('Downloaded Model!')
+                save_model(model, self.model_path)
             return (
                 model, 
                 self.model_path
